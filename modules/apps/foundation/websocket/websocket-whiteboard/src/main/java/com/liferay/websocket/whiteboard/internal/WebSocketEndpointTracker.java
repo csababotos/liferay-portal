@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.ServletContext;
-
 import javax.websocket.Decoder;
 import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
@@ -201,14 +200,13 @@ public class WebSocketEndpointTracker
 			return (List<Class<? extends Decoder>>)decObject;
 		}
 
-		String[] stringArray = _propToStringArray(decObject);
+		String[] stringArray = _propObjectToStringArray(decObject);
 
 		List<Class<? extends Decoder>> decoders = new ArrayList<>();
 
 		for (String className : stringArray) {
 			try {
-				@SuppressWarnings("rawtypes")
-				Class<?> c = Class.forName(className);
+				Class<? extends Decoder> c = (Class<? extends Decoder>) Class.forName(className);
 
 				decoders.add(c);
 				_logService.log(
@@ -237,14 +235,13 @@ public class WebSocketEndpointTracker
 			return (List<Class<? extends Encoder>>)encObject;
 		}
 
-		String[] stringArray = _propToStringArray(encObject);
+		String[] stringArray = _propObjectToStringArray(encObject);
 
 		List<Class<? extends Encoder>> encoders = new ArrayList<>();
 
 		for (String className : stringArray) {
 			try {
-				@SuppressWarnings("rawtypes")
-				Class<?> c = Class.forName(className);
+				Class<? extends Encoder> c = (Class<? extends Encoder>) Class.forName(className);
 
 				encoders.add(c);
 				_logService.log(
@@ -261,7 +258,28 @@ public class WebSocketEndpointTracker
 		return encoders;
 	}
 
-	private String[] _propToStringArray(Object prop) {
+	@SuppressWarnings("unchecked")
+	private List<String> _subprotocolObjectToList(Object spObject) {
+		if (spObject == null) {
+			return null;
+		}
+
+		if (spObject instanceof List) {
+			return (List<String>)spObject;
+		}
+
+		String[] stringArray = _propObjectToStringArray(spObject);
+
+		List<String> subprotocol = new ArrayList<>();
+
+		for (String s : stringArray) {
+			subprotocol.add(s);
+		}
+
+		return subprotocol;
+	}
+
+	private String[] _propObjectToStringArray(Object prop) {
 		String[] stringArray = null;
 
 		if (prop instanceof String) {
@@ -274,27 +292,6 @@ public class WebSocketEndpointTracker
 		}
 
 		return stringArray;
-	}
-
-	@SuppressWarnings("unchecked")
-	private List<String> _subprotocolObjectToList(Object spObject) {
-		if (spObject == null) {
-			return null;
-		}
-
-		if (spObject instanceof List) {
-			return (List<String>)spObject;
-		}
-
-		String[] stringArray = _propToStringArray(spObject);
-
-		List<String> subprotocol = new ArrayList<>();
-
-		for (String s : stringArray) {
-			subprotocol.add(s);
-		}
-
-		return subprotocol;
 	}
 
 	private BundleContext _bundleContext;
