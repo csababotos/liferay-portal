@@ -512,23 +512,19 @@ public class InvokerFilterHelper {
 			Set<Dispatcher> dispatchers = new HashSet<>();
 
 			Object dispatcherProperty = serviceReference.getProperty(
-					"dispatcher");
+				"dispatcher");
 			List<String> dispatcherStrings = new ArrayList<>();
 
-			if(dispatcherProperty != null) {
-				if(dispatcherProperty instanceof String[]) {
-
-					dispatcherStrings = StringPlus.asList(
-							dispatcherProperty);
-				} else {
-
-					dispatcherStrings.add(
-							dispatcherProperty.toString());
+			if (dispatcherProperty != null) {
+				if (dispatcherProperty instanceof String[]) {
+					dispatcherStrings = StringPlus.asList(dispatcherProperty);
+				}
+				else {
+					dispatcherStrings.add(dispatcherProperty.toString());
 				}
 			}
 
 			for (String dispatcher : dispatcherStrings) {
-
 				dispatchers.add(Dispatcher.valueOf(dispatcher));
 			}
 
